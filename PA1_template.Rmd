@@ -41,7 +41,7 @@ Data <- read.csv(DataFile)
 Temp <- formatC(Data$interval, width=4, flag="0")            ## Padding leading 0
 Temp1 <- paste(substr(Temp,1,2),":",substr(Temp,3,4),sep="") ## Format to hh:mm
 Temp2 <- paste(Data$date," ",Temp1,sep="")                   ## Format to yyyy-mm-dd hh:mm
-Data$date1 <- ymd_hm(Temp2)                                  ## Add new column and put in POSIXct date format
+Data$date1 <- ymd_hm(Temp2)                                  ## Put in POSIXct date format
 ``` 
   
 #### 1. What is mean total number of steps taken per day?
@@ -50,6 +50,7 @@ Here is the code to draw the histogram, please ignore the warning due to NA valu
 ## Calculate the total number of steps taken per day
 D1 <- aggregate(Data$steps, list(Data$date), sum)
 
+## Ogiginal Code using qplot but found using ggplot is better
 ##qplot(D1$x,
 ##      geom="histogram",
 ##      main="Histogram of the total number of steps taken each day",
@@ -64,7 +65,8 @@ D1 <- aggregate(Data$steps, list(Data$date), sum)
 ## when using ggplot I can add a density trend curve so decided to use ggplot
 ggplot(data=D1, aes(D1$x)) +
         geom_histogram(aes(y=..density..),
-                       breaks=seq(0, 22500, by=1000),
+                       ##breaks=seq(0, 22500, by=1000)
+                       breaks=seq(0, 25000, by=2500),
                        col="red",
                        fill="blue",
                        alpha=.2) +
@@ -86,11 +88,13 @@ D2 <- aggregate(Data$steps, list(Data$interval), mean, na.rm=TRUE)
 D2$interval <- D2$Group.1
 Temp <- formatC(D2$Group.1, width=4, flag="0")               ## padding leading 0 
 Temp1 <- paste(substr(Temp,1,2),":",substr(Temp,3,4),sep="") ## format to hh:mm
-Temp2 <- paste("2013-01-01"," ",Temp1,sep="")                ## format to yyyy-mm-dd hh:mm, just set a arbitary date
+Temp2 <- paste("2013-01-01"," ",Temp1,sep="")   ## format to yyyy-mm-dd hh:mm, just set a arbitary date
 D2$Group.1 <- ymd_hm(Temp2)                                  ## Change to POSIXct date format
 
 ##graph the result using base graphic system plot 
-plot(D2$Group.1, D2$x, type="l", col="red", xlab="Time of Day / Intervals", ylab="Average Steps", main="Average Daily Activity")
+plot(D2$Group.1, D2$x, type="l", col="red", 
+     xlab="Time of Day / Intervals", ylab="Average Steps", 
+     main="Average Daily Activity")
 
 ## Calculate 5-min interval max for reporting
 MaxInterval <- D2$interval[which.max(D2$x)]
@@ -136,7 +140,7 @@ D3 <- aggregate(Data2$steps, list(Data2$date), sum)
 ## Graph histogram using ggplot2 package
 ggplot(data=D3, aes(D3$x)) +
         geom_histogram(aes(y=..density..),
-                       breaks=seq(0, 22500, by=1500),
+                       breaks=seq(0, 25000, by=2500),
                        col="red",
                        fill="blue",
                        alpha=.2) +
@@ -173,4 +177,4 @@ xyplot(D4$steps~D4$interval|D4$WDay, Data=D4, type="l",
 
 Yes, there are some difference in activity patterns according to the graph, for
 example there are less activity between 5:30~10:00am during the weekend than
-weekday plus some other discrepancy. 
+weekday plus some other discrepancy.
